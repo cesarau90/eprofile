@@ -14,7 +14,7 @@ Proyecto académico · Asignatura Nuevas Tecnologías.
 |---|---|
 | Framework | **Next.js 14** (App Router) + **React 18** + **TypeScript** |
 | Estilos | **Tailwind CSS 3** (diseño responsivo, foco visible para teclado) |
-| Base de datos | **SQLite** en desarrollo · **PostgreSQL** en producción (mismo esquema) |
+| Base de datos | **PostgreSQL** vía **Prisma** (Neon / Supabase / Vercel Postgres) |
 | ORM | **Prisma 5** |
 | Autenticación | Sesión propia con **cookie firmada (JWT `HS256`, `jose`)**, `httpOnly`, `sameSite=lax` |
 | Contraseñas | **bcryptjs** (hash con salt, coste 10) — nunca en texto plano |
@@ -28,7 +28,7 @@ Proyecto académico · Asignatura Nuevas Tecnologías.
 ## 2. Requisitos previos
 
 - **Node.js 18.18+** (probado con Node 24).
-- No necesitas instalar ninguna base de datos: en desarrollo se usa **SQLite** (archivo local).
+- Una base de datos **PostgreSQL** y su `DATABASE_URL` (p. ej. una gratis en [neon.tech](https://neon.tech)).
 
 ---
 
@@ -237,20 +237,22 @@ Las imágenes subidas se guardan en `public/uploads/` (servidas y optimizadas po
 
 ---
 
-## 11. Cambiar a PostgreSQL (producción)
+## 11. Base de datos: PostgreSQL
 
-1. En `prisma/schema.prisma` cambia el `datasource`:
-   ```prisma
-   datasource db {
-     provider = "postgresql"
-     url      = env("DATABASE_URL")
-   }
-   ```
-2. En `.env` pon la cadena real:
-   `DATABASE_URL="postgresql://usuario:password@host:5432/eprofile?schema=public"`
-3. Ejecuta `npx prisma migrate deploy` (o `npx prisma db push`) y `npm run db:seed`.
+El proyecto usa **PostgreSQL** (`provider = "postgresql"` en `prisma/schema.prisma`).
+Tanto en desarrollo como en producción necesitas una cadena de conexión Postgres
+(Neon, Supabase, Vercel Postgres o un Postgres local) en `DATABASE_URL`.
 
-El código de la aplicación no cambia (Prisma abstrae el motor). El esquema es compatible con ambos.
+```
+DATABASE_URL="postgresql://usuario:password@host:5432/eprofile?sslmode=require"
+```
+
+Sincroniza el esquema y siembra los datos:
+
+```bash
+npx prisma db push
+npm run db:seed
+```
 
 ---
 
@@ -262,10 +264,9 @@ El código de la aplicación no cambia (Prisma abstrae el motor). El esquema es 
 2. Importa el proyecto en Vercel.
 3. Variables de entorno en Vercel: `DATABASE_URL`, `SESSION_SECRET` (cadena aleatoria larga),
    `NEXT_PUBLIC_SITE_URL` (el dominio final, p. ej. `https://eprofile.vercel.app`).
-4. Cambia el `provider` de Prisma a `postgresql` (sección 11).
-5. `Build Command`: `npm run build` · tras el primer despliegue ejecuta
-   `npx prisma migrate deploy` y `npm run db:seed` (desde la consola de Vercel o localmente
-   apuntando a la BD de producción).
+4. `Build Command` (por defecto `npm run build`) ya ejecuta `prisma db push` contra la BD.
+5. Tras el primer despliegue, siembra los datos una vez: `npm run db:seed` localmente
+   con `DATABASE_URL` apuntando a la BD de producción.
 6. Sustituye el almacenamiento de fotos por un bucket (sección 10).
 
 **Opción B — Servidor propio / Docker:**
