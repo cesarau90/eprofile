@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ProfileData, emptyProfile, publishBlockReason } from "@/lib/profile";
 import { CV_TEMPLATES } from "@/lib/cv-templates";
 import { Button, Field, Input, Textarea, Alert, Badge, Card } from "./ui";
+import { Avatar } from "./Avatar";
 import {
   saveDraftAction,
   publishAction,
@@ -272,8 +273,11 @@ export function ProfileEditor({ slug, initialData, initialHasChanges, initialSta
           </div>
           {data.photoUrl ? (
             <div className="sm:col-span-2 flex items-center gap-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={data.photoUrl} alt="Vista previa de la foto" className="h-16 w-16 rounded-lg object-cover" />
+              <Avatar
+                src={data.photoUrl}
+                fullName={data.fullName || "?"}
+                className="h-16 w-16 rounded-lg text-sm"
+              />
               <button type="button" className="text-xs text-red-600 underline" onClick={removePhoto}>
                 Quitar foto
               </button>

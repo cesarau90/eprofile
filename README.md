@@ -237,6 +237,10 @@ guarda en `photoUrl` del borrador.
 
 - `POST /api/p/:slug/photo` — sube la foto; si envías `previous` borra el blob anterior (reemplazo).
 - `DELETE /api/p/:slug/photo` con `{ "url": "..." }` — borra el blob (botón «Quitar foto»).
+- `GET /api/media/perfiles/:archivo` — sirve la imagen desde el dominio de la app
+  (proxy al blob). Se guarda esta ruta como `photoUrl`, no la URL directa de Blob,
+  para funcionar detrás de redes que bloquean `*.blob.vercel-storage.com`.
+- Si una imagen no carga, el componente `Avatar` muestra las iniciales del estudiante.
 
 Requiere `BLOB_READ_WRITE_TOKEN`. Si falta, la subida responde `503` y el resto de la app funciona.
 En local: `vercel env pull .env` tras vincular el proyecto, o pega el token del store en `.env`.

@@ -17,11 +17,32 @@ function hasBlobToken() {
   return !!process.env.BLOB_READ_WRITE_TOKEN;
 }
 
-/** Borra un blob solo si la URL pertenece a Vercel Blob (ignora errores). */
-async function deleteBlob(url: string | null | undefined) {
-  if (!url || !/\.public\.blob\.vercel-storage\.com\//.test(url)) return;
+/**
+ * Extrae el `pathname` del blob (carpeta `perfiles/…`) a partir de:
+ *  - la ruta interna `/api/media/perfiles/archivo.jpg`
+ *  - una URL completa `https://….blob.vercel-storage.com/perfiles/archivo.jpg`
+ * Devuelve null si no corresponde a una foto de perfil.
+ */
+function blobPathname(ref: string | null | undefined): string | null {
+  if (!ref) return null;
+  let path = ref;
+  if (/^https?:\/\//i.test(ref)) {
+    try {
+      path = new URL(ref).pathname;
+    } catch {
+      return null;
+    }
+  }
+  path = path.replace(/^\/?(api\/media\/)?/, "");
+  return /^perfiles\/[A-Za-z0-9._-]+$/.test(path) ? path : null;
+}
+
+/** Borra un blob de la carpeta de perfiles (ignora errores). */
+async function deleteBlob(ref: string | null | undefined) {
+  const path = blobPathname(ref);
+  if (!path) return;
   try {
-    await del(url);
+    await del(path);
   } catch {
     /* el blob ya no existe o el token no aplica: no es fatal */
   }
@@ -64,7 +85,7 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
   }
 
   const name = `perfiles/${params.slug}-${randomUUID()}.${TYPES[file.type]}`;
-  const blob = await put(name, bytes, {
+  await put(name, bytes, {
     access: "public",
     contentType: file.type,
     addRandomSuffix: false,
@@ -74,7 +95,9 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
   const previous = form.get("previous");
   if (typeof previous === "string") await deleteBlob(previous);
 
-  return NextResponse.json({ url: blob.url });
+  // Se guarda la ruta servida por la propia app (evita que el navegador
+  // consulte *.blob.vercel-storage.com, que algunas redes bloquean).
+  return NextResponse.json({ url: `/api/media/${name}` });
 }
 
 /** Elimina la foto actual. Acepta `{ url }` en el cuerpo JSON. */

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ProfileData, visibleSections } from "@/lib/profile";
 import { Badge } from "./ui";
+import { Avatar } from "./Avatar";
 import { ContactActions } from "./ContactActions";
 
 function Section({
@@ -38,35 +39,16 @@ export function ProfileView({
   publicUrl: string;
 }) {
   const vis = visibleSections(data);
-  const initials =
-    data.fullName
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((w) => w[0]?.toUpperCase())
-      .join("") || "?";
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
       {/* Portada: foto, nombre, carrera, reseña */}
       <header className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-start sm:text-left">
-        {data.photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={data.photoUrl}
-            alt={`Fotografía de ${data.fullName}`}
-            width={128}
-            height={128}
-            className="h-32 w-32 flex-shrink-0 rounded-2xl object-cover shadow-md"
-          />
-        ) : (
-          <div
-            aria-hidden
-            className="flex h-32 w-32 flex-shrink-0 items-center justify-center rounded-2xl bg-brand-100 text-3xl font-bold text-brand-700 shadow-md"
-          >
-            {initials}
-          </div>
-        )}
+        <Avatar
+          src={data.photoUrl}
+          fullName={data.fullName}
+          className="h-32 w-32 flex-shrink-0 rounded-2xl text-3xl shadow-md"
+        />
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             {data.fullName}
