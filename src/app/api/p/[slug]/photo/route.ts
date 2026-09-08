@@ -4,6 +4,7 @@ import { put, del } from "@vercel/blob";
 import { requireProfileAccess } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const MAX_BYTES = 4 * 1024 * 1024;
 const TYPES: Record<string, string> = {
@@ -57,8 +58,17 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     return NextResponse.json({ error: "La imagen supera los 4 MB." }, { status: 400 });
   }
 
+  const bytes = Buffer.from(await file.arrayBuffer());
+  if (bytes.length === 0) {
+    return NextResponse.json({ error: "El archivo llegó vacío. Intenta de nuevo." }, { status: 400 });
+  }
+
   const name = `perfiles/${params.slug}-${randomUUID()}.${TYPES[file.type]}`;
-  const blob = await put(name, file, { access: "public", contentType: file.type });
+  const blob = await put(name, bytes, {
+    access: "public",
+    contentType: file.type,
+    addRandomSuffix: false,
+  });
 
   // Reemplazo: si venía una foto anterior en Blob, la borramos.
   const previous = form.get("previous");
