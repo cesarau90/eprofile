@@ -2,7 +2,7 @@
  * Pruebas de aceptación (sin servidor HTTP): validan la lógica de negocio
  * directamente contra la base de datos sembrada y las funciones puras.
  *
- * Uso:  npm run test   (ejecuta db push + seed + estas comprobaciones)
+ * Uso:  npm run test   (ejecuta migrate deploy + seed + estas comprobaciones)
  */
 import { execSync } from "child_process";
 import { PrismaClient } from "@prisma/client";
@@ -33,8 +33,8 @@ function check(name: string, cond: boolean) {
 }
 
 async function main() {
-  console.log("→ Preparando base de datos de prueba (db push + seed)…");
-  execSync("npx prisma db push --skip-generate --accept-data-loss", { stdio: "inherit" });
+  console.log("→ Preparando base de datos de prueba (migrate deploy + seed)…");
+  execSync("npx prisma migrate deploy", { stdio: "inherit" });
   execSync("npx tsx prisma/seed.ts", { stdio: "inherit" });
 
   const prisma = new PrismaClient();

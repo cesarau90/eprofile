@@ -9,6 +9,5 @@ tsconfig.tsbuildinfo
 next-env.d.ts
 prisma/dev.db
 prisma/dev.db-journal
-public/uploads/*
-!public/uploads/.gitkeep
+.vercel
 .DS_Store

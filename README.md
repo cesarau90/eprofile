@@ -38,12 +38,13 @@ Proyecto académico · Asignatura Nuevas Tecnologías.
 # 1. Instalar dependencias
 npm install
 
-# 2. Crear el archivo de entorno
+# 2. Crear el archivo de entorno y poner DATABASE_URL (Postgres) y SESSION_SECRET
 cp .env.example .env
 #    (Windows PowerShell:  Copy-Item .env.example .env)
+#    BLOB_READ_WRITE_TOKEN es opcional en local (sin él no se pueden subir fotos).
 
 # 3. Preparar base de datos + datos de demostración
-npm run setup       # = prisma generate + prisma db push + seed
+npm run setup       # = prisma generate + prisma migrate deploy + seed
 
 # 4. Arrancar en modo desarrollo
 npm run dev
@@ -55,7 +56,10 @@ Abre **http://localhost:3000**
 
 | Script | Qué hace |
 |---|---|
-| `npm run setup` | Genera el cliente Prisma, crea el esquema en la BD y siembra datos demo |
+| `npm run setup` | Genera el cliente Prisma, aplica las migraciones y siembra datos demo |
+| `npm run vercel-build` | Build de Vercel: `prisma generate` + `prisma migrate deploy` + `next build` |
+| `npm run prisma:migrate` | Crea una migración nueva a partir de cambios en `schema.prisma` |
+| `npm run prisma:deploy` | Aplica las migraciones pendientes (producción) |
 | `npm run dev` | Servidor de desarrollo |
 | `npm run build` | Compilación de producción |
 | `npm start` | Sirve la compilación de producción |
@@ -227,13 +231,15 @@ Setting
 
 ## 10. Fotografías
 
-Las imágenes subidas se guardan en `public/uploads/` (servidas y optimizadas por Next `<Image>` /
-`<img>` con tamaño fijo). Validación: JPG/PNG/WebP, máximo 4 MB, solo el dueño o el admin puede subir.
+Las imágenes se guardan en **Vercel Blob** (`src/app/api/p/[slug]/photo/route.ts`). Validación:
+JPG/PNG/WebP, máximo 4 MB, solo el dueño o el admin puede subir. La URL pública del blob se
+guarda en `photoUrl` del borrador.
 
-> **En producción** se recomienda sustituir el almacenamiento local por un bucket de objetos
-> (S3, Cloudflare R2, Supabase Storage). El punto de cambio es
-> `src/app/api/p/[slug]/photo/route.ts` (función `writeFile`) — reemplazar por una subida al bucket
-> y guardar la URL pública devuelta.
+- `POST /api/p/:slug/photo` — sube la foto; si envías `previous` borra el blob anterior (reemplazo).
+- `DELETE /api/p/:slug/photo` con `{ "url": "..." }` — borra el blob (botón «Quitar foto»).
+
+Requiere `BLOB_READ_WRITE_TOKEN`. Si falta, la subida responde `503` y el resto de la app funciona.
+En local: `vercel env pull .env` tras vincular el proyecto, o pega el token del store en `.env`.
 
 ---
 
@@ -250,7 +256,7 @@ DATABASE_URL="postgresql://usuario:password@host:5432/eprofile?sslmode=require"
 Sincroniza el esquema y siembra los datos:
 
 ```bash
-npx prisma db push
+npx prisma migrate deploy
 npm run db:seed
 ```
 
@@ -258,16 +264,19 @@ npm run db:seed
 
 ## 12. Despliegue
 
-**Opción A — Vercel + Postgres gestionado (Neon/Supabase/Vercel Postgres):**
+**Opción A — Vercel + Neon Postgres + Vercel Blob:**
 
-1. Sube el repositorio a GitHub.
-2. Importa el proyecto en Vercel.
-3. Variables de entorno en Vercel: `DATABASE_URL`, `SESSION_SECRET` (cadena aleatoria larga),
+1. Sube el repositorio a GitHub e importa el proyecto en Vercel.
+2. En el proyecto de Vercel → **Storage**:
+   - Crea una base **Neon Postgres** → inyecta `DATABASE_URL`.
+   - Crea un store **Blob** → inyecta `BLOB_READ_WRITE_TOKEN`.
+3. Añade las variables restantes: `SESSION_SECRET` (cadena aleatoria larga) y
    `NEXT_PUBLIC_SITE_URL` (el dominio final, p. ej. `https://eprofile.vercel.app`).
-4. `Build Command` (por defecto `npm run build`) ya ejecuta `prisma db push` contra la BD.
-5. Tras el primer despliegue, siembra los datos una vez: `npm run db:seed` localmente
-   con `DATABASE_URL` apuntando a la BD de producción.
-6. Sustituye el almacenamiento de fotos por un bucket (sección 10).
+4. El `Build Command` es `npm run vercel-build` (`prisma generate && prisma migrate deploy && next build`).
+   Vercel lo detecta por el script `vercel-build` del `package.json`.
+5. **Una sola vez**, tras el primer despliegue, siembra los datos ejecutando en local
+   `npm run db:seed` con `DATABASE_URL` apuntando a la BD de producción. El seed **no** se
+   ejecuta en cada despliegue.
 
 **Opción B — Servidor propio / Docker:**
 
@@ -306,7 +315,7 @@ Pon la app detrás de un proxy inverso con HTTPS (las cookies de sesión usan `S
 npm run test
 ```
 
-`tests/run.ts` prepara una base limpia (db push + seed) y verifica: autenticación por roles y
+`tests/run.ts` prepara la base (migrate deploy + seed) y verifica: autenticación por roles y
 hash de contraseñas, estados de perfil (vacío/borrador/publicado), separación borrador↔publicado,
 regla de publicación (nombre + carrera), slug único y válido, aislamiento entre estudiantes,
 ocultamiento de perfiles inactivos/sin publicar, secciones vacías ocultas, generación de PDF/QR/vCard
@@ -365,7 +374,7 @@ servidor de producción (`/admin`, `/[slug]/admin`, `/[slug]/preview`, `POST /ap
 ### No implementado / fuera de alcance
 
 - [ ] Diagrama Mermaid del flujo (omitido a petición del cliente; el flujo está descrito en la sección 8).
-- [ ] Migraciones versionadas de Prisma: se usa `prisma db push` (sincronización directa del esquema).
+- [x] Migraciones versionadas de Prisma (`prisma/migrations/`, aplicadas con `prisma migrate deploy`).
       Para producción conviene `prisma migrate` — ver sección 11.
 - [ ] Restablecimiento de contraseña por autoservicio del estudiante (solo lo hace el administrador).
 - [ ] Verificación de correos y recuperación por email (no requerido para el MVP).
@@ -374,11 +383,8 @@ servidor de producción (`/admin`, `/[slug]/admin`, `/[slug]/preview`, `POST /ap
 
 ## 16. Limitaciones conocidas
 
-- **Almacenamiento de fotos local** (`public/uploads/`): válido para desarrollo y demo; en un
-  despliegue serverless (Vercel) el sistema de archivos no es persistente — usar un bucket
-  (sección 10).
-- **SQLite por defecto**: pensado para desarrollo/demostración. Producción multiusuario debe usar
-  PostgreSQL (sección 11).
+- **Blobs huérfanos**: si falla la petición `DELETE` al quitar una foto, el archivo puede quedar
+  en el store de Blob sin referencia. No afecta al funcionamiento.
 - **Sesión de 7 días** sin refresco deslizante ni revocación individual: al desactivar una cuenta,
   el acceso privado se corta en la siguiente petición (se revalida contra la BD) y la EProfile
   pública deja de verse de inmediato.

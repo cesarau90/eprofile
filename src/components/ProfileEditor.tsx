@@ -141,6 +141,7 @@ export function ProfileEditor({ slug, initialData, initialHasChanges, initialSta
     try {
       const fd = new FormData();
       fd.append("file", file);
+      if (data.photoUrl) fd.append("previous", data.photoUrl);
       const res = await fetch(`/api/p/${slug}/photo`, { method: "POST", body: fd });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Error al subir la imagen");
@@ -150,6 +151,21 @@ export function ProfileEditor({ slug, initialData, initialHasChanges, initialSta
       setResult({ ok: false, message: e instanceof Error ? e.message : "Error al subir la imagen" });
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function removePhoto() {
+    const url = data.photoUrl;
+    patch({ photoUrl: "" });
+    if (!url) return;
+    try {
+      await fetch(`/api/p/${slug}/photo`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+    } catch {
+      /* la referencia ya se quitó del borrador; el blob huérfano no es crítico */
     }
   }
 
@@ -258,7 +274,7 @@ export function ProfileEditor({ slug, initialData, initialHasChanges, initialSta
             <div className="sm:col-span-2 flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={data.photoUrl} alt="Vista previa de la foto" className="h-16 w-16 rounded-lg object-cover" />
-              <button type="button" className="text-xs text-red-600 underline" onClick={() => patch({ photoUrl: "" })}>
+              <button type="button" className="text-xs text-red-600 underline" onClick={removePhoto}>
                 Quitar foto
               </button>
             </div>
