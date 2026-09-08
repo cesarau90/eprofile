@@ -43,5 +43,10 @@ export async function saveSettings(s: PlatformSettings) {
 }
 
 export function siteUrl(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  // 1) Valor explícito. 2) Dominio de producción que Vercel inyecta solo
+  // (VERCEL_PROJECT_PRODUCTION_URL, sin protocolo). 3) Fallback local.
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  const raw = explicit || (vercel ? `https://${vercel}` : "http://localhost:3000");
+  return raw.replace(/\/$/, "");
 }
