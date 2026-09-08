@@ -1,0 +1,45 @@
+// EProfile — esquema de base de datos
+// Proveedor por defecto: SQLite (desarrollo sin dependencias externas).
+// Para PostgreSQL en producción: cambia provider a "postgresql" y DATABASE_URL.
+// El contenido rico del perfil (formación, experiencia, habilidades, proyectos,
+// reconocimientos, enlaces) se guarda serializado como JSON en Student.draftData
+// y Student.publishedData. Esto separa de forma estricta el borrador del
+// contenido publicado y garantiza que EProfile pública, CV en pantalla, PDF y
+// vCard usen exactamente la misma información publicada.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("STUDENT") // "STUDENT" | "PLATFORM_ADMIN"
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  student      Student?
+}
+
+model Student {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  draftData     String   @default("{}") // JSON ProfileData (siempre existe)
+  publishedData String? // JSON ProfileData; null = nunca publicado
+  publishedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Setting {
+  key   String @id
+  value String
+}
