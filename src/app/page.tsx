@@ -9,20 +9,46 @@ export const dynamic = "force-dynamic";
 
 type Card = { slug: string; fullName: string; headline: string; bio: string; photoUrl: string };
 
-/** Cuadro decorativo tipo QR (no codifica nada; solo ilustra la EProfile). */
+/** QR decorativo de aspecto realista (no codifica nada; solo ilustra la EProfile). */
 function MiniQR() {
-  const cells = [
-    0b1111111, 0b1000001, 0b1011101, 0b1011101, 0b1011101, 0b1000001, 0b1111111,
-  ];
+  const N = 21;
+  // Patrón de localización 7x7 en las tres esquinas.
+  const finder = (ox: number, oy: number) =>
+    Array.from({ length: 7 }, (_, y) =>
+      Array.from({ length: 7 }, (_, x) => {
+        const edge = x === 0 || x === 6 || y === 0 || y === 6;
+        const core = x >= 2 && x <= 4 && y >= 2 && y <= 4;
+        return edge || core ? [ox + x, oy + y] : null;
+      }),
+    )
+      .flat()
+      .filter(Boolean) as [number, number][];
+
+  const inFinder = (x: number, y: number) =>
+    (x < 8 && y < 8) || (x > N - 9 && y < 8) || (x < 8 && y > N - 9);
+
+  const dark = new Set<string>();
+  [...finder(0, 0), ...finder(N - 7, 0), ...finder(0, N - 7)].forEach(([x, y]) =>
+    dark.add(`${x},${y}`),
+  );
+  // Módulos de datos pseudoaleatorios pero deterministas.
+  for (let y = 0; y < N; y++) {
+    for (let x = 0; x < N; x++) {
+      if (inFinder(x, y)) continue;
+      if (((x * 7 + y * 13 + x * y * 3) % 5) < 2) dark.add(`${x},${y}`);
+    }
+  }
+
   return (
-    <svg viewBox="0 0 7 7" className="h-12 w-12 rounded-md bg-white p-1 shadow-sm" aria-hidden>
-      {cells.flatMap((row, y) =>
-        Array.from({ length: 7 }, (_, x) =>
-          row & (1 << (6 - x)) ? (
-            <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" fill="#4338ca" />
-          ) : null,
-        ),
-      )}
+    <svg
+      viewBox={`0 0 ${N} ${N}`}
+      className="h-12 w-12 rounded-md bg-white p-1 shadow-sm ring-1 ring-slate-200"
+      aria-hidden
+    >
+      {[...dark].map((k) => {
+        const [x, y] = k.split(",");
+        return <rect key={k} x={x} y={y} width="1" height="1" fill="#312e81" />;
+      })}
     </svg>
   );
 }
@@ -36,8 +62,8 @@ function ProfilePreview() {
           EP
         </div>
         <div className="min-w-0">
-          <p className="font-semibold text-slate-900">Tu nombre</p>
-          <p className="truncate text-sm text-brand-700">Ingeniería · Tu universidad</p>
+          <p className="font-semibold text-slate-900">Tu perfil profesional</p>
+          <p className="truncate text-sm text-brand-700">Tu información siempre actualizada</p>
         </div>
       </div>
 
