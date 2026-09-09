@@ -89,6 +89,45 @@ body {
 }
 .ring-added { animation: ui-added 1200ms ease-out; }
 
+/* Tarjeta de presentación con QR */
+@keyframes ui-card-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+.anim-card-in { animation: ui-card-in 340ms ease-out both; }
+
+.biz-card {
+  width: 85mm;
+  height: 55mm;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.biz-card-slot {
+  height: 99mm; /* 55mm × 1.8 */
+  overflow: hidden;
+}
+.biz-card-stage {
+  display: flex;
+  justify-content: center;
+  transform: scale(1.8);
+  transform-origin: top center;
+}
+@media (max-width: 640px) {
+  .biz-card-slot { height: 69mm; }
+  .biz-card-stage { transform: scale(1.25); }
+}
+@media print {
+  .anim-card-in { animation: none !important; }
+  .biz-card-slot { height: auto !important; overflow: visible !important; }
+  .biz-card-stage { transform: none !important; display: block !important; }
+  .biz-card { box-shadow: none !important; }
+  .card-print-page {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}
+
 /* Acordeón: alto animado sin desmontar contenido */
 .acc-wrap {
   display: grid;
@@ -121,11 +160,13 @@ body {
   .anim-in-left,
   .anim-in-right,
   .anim-pop-in,
-  .anim-row-in {
+  .anim-row-in,
+  .anim-card-in {
     opacity: 1 !important;
     transform: none !important;
   }
   .anim-row-in,
+  .anim-card-in,
   .ring-added { animation: none !important; }
   .acc-wrap { transition: none !important; }
   html { scroll-behavior: auto !important; }
