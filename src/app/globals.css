@@ -49,6 +49,14 @@ body {
 @keyframes login-spin {
   to { transform: rotate(360deg); }
 }
+@keyframes ui-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ui-pop-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
 
 .login-anim-left { animation: login-in-left 420ms ease-out both; }
 .login-anim-right { animation: login-in-right 420ms ease-out both; }
@@ -60,18 +68,37 @@ body {
 .login-error-anim { animation: login-shake 400ms ease-in-out both; }
 .login-spinner { animation: login-spin 600ms linear infinite; }
 
+/* Utilidades de animación reutilizables (login + /admin) */
+.anim-fade-in { animation: ui-fade-in 320ms ease-out both; }
+.anim-in-up { animation: login-in-up 340ms ease-out both; }
+.anim-in-left { animation: login-in-left 380ms ease-out both; }
+.anim-in-right { animation: login-in-right 380ms ease-out both; }
+.anim-pop-in { animation: ui-pop-in 220ms ease-out both; }
+.anim-spinner { animation: login-spin 600ms linear infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   .login-anim-left,
   .login-anim-right,
   .login-anim-benefit,
   .login-bg-anim,
   .login-error-anim,
-  .login-spinner {
+  .login-spinner,
+  .anim-fade-in,
+  .anim-in-up,
+  .anim-in-left,
+  .anim-in-right,
+  .anim-pop-in,
+  .anim-spinner {
     animation: none !important;
   }
   .login-anim-left,
   .login-anim-right,
-  .login-anim-benefit {
+  .login-anim-benefit,
+  .anim-fade-in,
+  .anim-in-up,
+  .anim-in-left,
+  .anim-in-right,
+  .anim-pop-in {
     opacity: 1 !important;
     transform: none !important;
   }

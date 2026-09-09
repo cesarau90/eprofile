@@ -13,15 +13,17 @@ export default async function AdminPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <PanelHeader
-        title="Panel del administrador de plataforma"
-        subtitle={`${students.length} estudiante(s)`}
-        right={
-          <Link href="/admin/settings" className="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-600 hover:bg-brand-50">
-            Ajustes
-          </Link>
-        }
-      />
+      <div className="anim-fade-in">
+        <PanelHeader
+          title="Panel del administrador de plataforma"
+          subtitle={`${students.length} estudiante(s)`}
+          right={
+            <Link href="/admin/settings" className="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-600 hover:bg-brand-50">
+              Ajustes
+            </Link>
+          }
+        />
+      </div>
       <main className="mx-auto max-w-5xl px-4 py-6">
         <AdminClient students={students} />
       </main>
