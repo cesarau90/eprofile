@@ -101,7 +101,7 @@ export function CardView({
           <div className="biz-card overflow-hidden rounded-[3mm] border border-slate-200 bg-gradient-to-br from-brand-50 via-white to-brand-100 shadow-lg print:shadow-none">
             <div className="flex h-full">
               {/* Datos */}
-              <div className="flex min-w-0 flex-1 flex-col justify-between p-[4mm]">
+              <div className="flex min-w-0 flex-1 flex-col justify-between p-[3.5mm]">
                 <div className="min-w-0">
                   <div className="flex items-center gap-[1.5mm]">
                     <span className="flex h-[7mm] w-[7mm] items-center justify-center rounded-[1.5mm] bg-brand-600 text-[3mm] font-bold text-white">
@@ -123,14 +123,14 @@ export function CardView({
               </div>
 
               {/* QR */}
-              <div className="flex flex-col items-center justify-center gap-[1.5mm] bg-white/60 p-[3mm]">
+              <div className="flex flex-col items-center justify-center gap-[1.2mm] bg-white/60 p-[2.5mm]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={`/api/p/${slug}/qr`}
                   alt={`Código QR que abre ${url}`}
-                  width={200}
-                  height={200}
-                  className="h-[26mm] w-[26mm] rounded-[1mm] bg-white p-[1.5mm]"
+                  width={240}
+                  height={240}
+                  className="h-[33mm] w-[33mm] rounded-[1mm] bg-white p-[1.5mm]"
                 />
                 <p className="max-w-[30mm] text-center text-[2mm] leading-tight text-slate-500">
                   Escanea para ver mi EProfile
