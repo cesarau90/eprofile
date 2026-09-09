@@ -49,7 +49,7 @@ export default function LoginPage() {
     <main className="relative min-h-screen overflow-hidden bg-brand-50">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-brand-50 via-white to-brand-100"
+        className="login-bg-anim pointer-events-none absolute inset-0 bg-gradient-to-br from-brand-50 via-white to-brand-100"
       />
       <div
         aria-hidden
@@ -62,7 +62,7 @@ export default function LoginPage() {
 
       <div className="relative mx-auto grid min-h-screen max-w-5xl items-center gap-10 px-4 py-10 lg:grid-cols-2 lg:gap-12">
         {/* Columna informativa: segunda en celular, primera en escritorio */}
-        <section className="order-2 max-w-xl lg:order-1">
+        <section className="login-anim-left order-2 max-w-xl lg:order-1">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 rounded text-sm font-medium text-brand-700 hover:text-brand-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
@@ -78,8 +78,12 @@ export default function LoginPage() {
           </p>
 
           <ul className="mt-6 hidden space-y-3 sm:block">
-            {BENEFITS.map((b) => (
-              <li key={b} className="flex items-start gap-3 text-sm text-slate-700">
+            {BENEFITS.map((b, i) => (
+              <li
+                key={b}
+                className="login-anim-benefit flex items-start gap-3 text-sm text-slate-700"
+                style={{ animationDelay: `${150 + i * 120}ms` }}
+              >
                 <span
                   aria-hidden
                   className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700"
@@ -93,7 +97,7 @@ export default function LoginPage() {
         </section>
 
         {/* Columna del formulario: primera en celular */}
-        <section className="order-1 w-full justify-self-center lg:order-2 lg:justify-self-end">
+        <section className="login-anim-right order-1 w-full justify-self-center lg:order-2 lg:justify-self-end">
           <div className="w-full max-w-sm rounded-2xl border border-brand-100 bg-white p-6 shadow-xl shadow-brand-900/5 sm:p-7">
             <h2 className="text-lg font-semibold text-slate-900">Iniciar sesión</h2>
             <p className="mt-1 text-sm text-slate-500">
@@ -102,7 +106,7 @@ export default function LoginPage() {
 
             <form onSubmit={onSubmit} className="mt-5 space-y-4">
               {error ? (
-                <div aria-live="assertive">
+                <div aria-live="assertive" className="login-error-anim">
                   <Alert kind="error">{error}</Alert>
                 </div>
               ) : null}
@@ -115,6 +119,7 @@ export default function LoginPage() {
                   autoComplete="email"
                   required
                   placeholder="tucorreo@ejemplo.com"
+                  className="transition duration-300"
                 />
               </Field>
 
@@ -126,7 +131,7 @@ export default function LoginPage() {
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
                     required
-                    className="pr-20"
+                    className="pr-20 transition duration-300"
                   />
                   <button
                     type="button"
@@ -139,8 +144,27 @@ export default function LoginPage() {
                 </div>
               </Field>
 
-              <Button type="submit" disabled={pending} className="w-full">
-                {pending ? "Iniciando sesión…" : "Iniciar sesión"}
+              <Button
+                type="submit"
+                disabled={pending}
+                className="w-full duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-lg"
+              >
+                {pending ? (
+                  <>
+                    <svg
+                      className="login-spinner h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      aria-hidden
+                    >
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" strokeWidth="4" />
+                      <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                    </svg>
+                    Iniciando sesión…
+                  </>
+                ) : (
+                  "Iniciar sesión"
+                )}
               </Button>
             </form>
 

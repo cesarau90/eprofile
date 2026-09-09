@@ -21,6 +21,62 @@ body {
   border-radius: 4px;
 }
 
+/* --- Animaciones sutiles de /login --- */
+@keyframes login-in-left {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes login-in-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes login-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes login-bg-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes login-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+@keyframes login-spin {
+  to { transform: rotate(360deg); }
+}
+
+.login-anim-left { animation: login-in-left 420ms ease-out both; }
+.login-anim-right { animation: login-in-right 420ms ease-out both; }
+.login-anim-benefit { animation: login-in-up 380ms ease-out both; }
+.login-bg-anim {
+  background-size: 300% 300%;
+  animation: login-bg-pan 10s ease-in-out infinite;
+}
+.login-error-anim { animation: login-shake 400ms ease-in-out both; }
+.login-spinner { animation: login-spin 600ms linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .login-anim-left,
+  .login-anim-right,
+  .login-anim-benefit,
+  .login-bg-anim,
+  .login-error-anim,
+  .login-spinner {
+    animation: none !important;
+  }
+  .login-anim-left,
+  .login-anim-right,
+  .login-anim-benefit {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @media print {
   .no-print {
     display: none !important;
