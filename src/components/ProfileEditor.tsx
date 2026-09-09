@@ -30,35 +30,6 @@ const SECTIONS = [
   { id: "cv", label: "Plantilla del CV" },
 ] as const;
 
-function ExpandCollapseButtons({
-  onExpand,
-  onCollapse,
-  className = "",
-}: {
-  onExpand: () => void;
-  onCollapse: () => void;
-  className?: string;
-}) {
-  const btn =
-    "inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-600 transition duration-200 hover:bg-slate-50";
-  return (
-    <div className={`flex flex-wrap gap-2 ${className}`}>
-      <button type="button" onClick={onExpand} className={btn} title="Expandir todo">
-        <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5" aria-hidden>
-          <path d="M8 10 12 6l4 4M8 14l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        Expandir todo
-      </button>
-      <button type="button" onClick={onCollapse} className={btn} title="Contraer todo">
-        <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5" aria-hidden>
-          <path d="M8 6 12 10l4-4M8 18l4-4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        Contraer todo
-      </button>
-    </div>
-  );
-}
-
 function Spinner() {
   return (
     <svg className="anim-spinner h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -425,7 +396,15 @@ export function ProfileEditor({ slug, initialData, initialHasChanges, initialSta
             </li>
           ))}
         </ul>
-        <ExpandCollapseButtons onExpand={expandAll} onCollapse={collapseAll} className="mt-3 px-3" />
+        <div className="mt-3 flex gap-2 px-3">
+          <button type="button" onClick={expandAll} className="text-xs text-brand-600 hover:underline">
+            Expandir todo
+          </button>
+          <span className="text-slate-300">·</span>
+          <button type="button" onClick={collapseAll} className="text-xs text-brand-600 hover:underline">
+            Contraer todo
+          </button>
+        </div>
       </nav>
 
       <div className="min-w-0 space-y-5">
@@ -516,7 +495,14 @@ export function ProfileEditor({ slug, initialData, initialHasChanges, initialSta
               </option>
             ))}
           </select>
-          <ExpandCollapseButtons onExpand={expandAll} onCollapse={collapseAll} className="mt-2" />
+          <div className="mt-2 flex gap-3">
+            <button type="button" onClick={expandAll} className="text-xs text-brand-600 hover:underline">
+              Expandir todo
+            </button>
+            <button type="button" onClick={collapseAll} className="text-xs text-brand-600 hover:underline">
+              Contraer todo
+            </button>
+          </div>
         </div>
 
         {/* Portada */}
