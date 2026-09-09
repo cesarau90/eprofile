@@ -76,6 +76,28 @@ body {
 .anim-pop-in { animation: ui-pop-in 220ms ease-out both; }
 .anim-spinner { animation: login-spin 600ms linear infinite; }
 
+/* Filas repetibles */
+@keyframes ui-row-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+.anim-row-in { animation: ui-row-in 260ms ease-out both; }
+
+@keyframes ui-added {
+  0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.45); }
+  100% { box-shadow: 0 0 0 8px rgba(79, 70, 229, 0); }
+}
+.ring-added { animation: ui-added 1200ms ease-out; }
+
+/* Acordeón: alto animado sin desmontar contenido */
+.acc-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 300ms ease;
+}
+.acc-wrap.open { grid-template-rows: 1fr; }
+.acc-inner { overflow: hidden; min-height: 0; }
+
 @media (prefers-reduced-motion: reduce) {
   .login-anim-left,
   .login-anim-right,
@@ -98,10 +120,15 @@ body {
   .anim-in-up,
   .anim-in-left,
   .anim-in-right,
-  .anim-pop-in {
+  .anim-pop-in,
+  .anim-row-in {
     opacity: 1 !important;
     transform: none !important;
   }
+  .anim-row-in,
+  .ring-added { animation: none !important; }
+  .acc-wrap { transition: none !important; }
+  html { scroll-behavior: auto !important; }
 }
 
 @media print {

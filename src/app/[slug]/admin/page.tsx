@@ -39,7 +39,7 @@ export default async function StudentAdminPage({ params }: { params: { slug: str
           </Link>
         }
       />
-      <main className="mx-auto max-w-3xl px-4 py-6">
+      <main className="mx-auto max-w-5xl px-4 py-6">
         {actingAsAdmin ? (
           <div className="mb-4">
             <Alert kind="warning">
