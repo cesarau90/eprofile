@@ -161,7 +161,8 @@ export function ProfileView({
     <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
       {/* Hero */}
       <header className="anim-in-up overflow-hidden rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-brand-100 p-6 shadow-xl shadow-brand-900/5 sm:p-8">
-        <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-start sm:text-left">
+        {/* Identidad: foto centrada junto a nombre / carrera / ubicación */}
+        <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:text-left">
           <Avatar
             src={data.photoUrl}
             fullName={data.fullName}
@@ -181,25 +182,27 @@ export function ProfileView({
                 <PinIcon /> {data.location}
               </p>
             ) : null}
-            {vis.bio ? (
-              <p className="anim-in-up mt-3 whitespace-pre-line text-slate-600" style={{ animationDelay: "260ms" }}>
-                {data.bio}
-              </p>
-            ) : null}
-            {primarySkills.length > 0 ? (
-              <div className="anim-in-up mt-4 flex flex-wrap justify-center gap-1.5 sm:justify-start" style={{ animationDelay: "320ms" }}>
-                {primarySkills.map((s, i) => (
-                  <span
-                    key={i}
-                    className="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-brand-700 ring-1 ring-brand-100"
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
-            ) : null}
           </div>
         </div>
+
+        {vis.bio ? (
+          <p className="anim-in-up mt-5 whitespace-pre-line text-slate-600" style={{ animationDelay: "260ms" }}>
+            {data.bio}
+          </p>
+        ) : null}
+
+        {primarySkills.length > 0 ? (
+          <div className="anim-in-up mt-4 flex flex-wrap justify-center gap-1.5 sm:justify-start" style={{ animationDelay: "320ms" }}>
+            {primarySkills.map((s, i) => (
+              <span
+                key={i}
+                className="rounded-full bg-white/70 px-2.5 py-1 text-xs font-medium text-brand-700 ring-1 ring-brand-100"
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+        ) : null}
 
         <div className="anim-in-up" style={{ animationDelay: "380ms" }}>
           <ContactActions slug={slug} publicUrl={publicUrl} fullName={data.fullName} contact={data.contact} />
