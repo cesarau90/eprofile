@@ -156,57 +156,47 @@ async function main() {
     create: { email: adminEmail, passwordHash: await hash(adminPassword), role: "PLATFORM_ADMIN" },
   });
 
-  // Estudiante 1: perfil PUBLICADO y sin cambios pendientes.
-  await prisma.user.upsert({
-    where: { email: s1Email },
-    update: { passwordHash: await hash(s1Password), active: true },
-    create: {
-      email: s1Email,
-      passwordHash: await hash(s1Password),
-      role: "STUDENT",
-      student: {
-        create: {
-          slug: "juan-perez",
-          draftData: JSON.stringify(juan),
-          publishedData: JSON.stringify(juan),
-          publishedAt: new Date(),
-        },
+  // Contenido de perfil (draftData / publishedData / publishedAt) SOLO se
+  // escribe al crear la cuenta por primera vez. En cuentas que ya existen, el
+  // seed nunca toca el contenido: el estado (borrador/publicado) lo controla
+  // únicamente el usuario con "Guardar borrador" / "Publicar". Antes, un
+  // `student.update` incondicional revertía a María a "borrador" cada vez que
+  // corría el seed (p. ej. `npm run test`).
+  async function seedStudent(
+    email: string,
+    password: string,
+    slug: string,
+    initial: { draftData: string; publishedData: string | null; publishedAt: Date | null },
+  ) {
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: { passwordHash: await hash(password), active: true },
+      create: {
+        email,
+        passwordHash: await hash(password),
+        role: "STUDENT",
+        student: { create: { slug, ...initial } },
       },
-    },
-  });
-  await prisma.student.update({
-    where: { slug: "juan-perez" },
-    data: {
-      draftData: JSON.stringify(juan),
-      publishedData: JSON.stringify(juan),
-      publishedAt: new Date(),
-    },
+      include: { student: true },
+    });
+    // Cuenta preexistente sin ficha de estudiante: crearla una sola vez.
+    if (!user.student) {
+      await prisma.student.create({ data: { userId: user.id, slug, ...initial } });
+    }
+  }
+
+  // Estudiante 1: perfil PUBLICADO y sin cambios pendientes.
+  await seedStudent(s1Email, s1Password, "juan-perez", {
+    draftData: JSON.stringify(juan),
+    publishedData: JSON.stringify(juan),
+    publishedAt: new Date(),
   });
 
   // Estudiante 2: perfil PUBLICADO + BORRADOR pendiente (cambios no publicados).
-  await prisma.user.upsert({
-    where: { email: s2Email },
-    update: { passwordHash: await hash(s2Password), active: true },
-    create: {
-      email: s2Email,
-      passwordHash: await hash(s2Password),
-      role: "STUDENT",
-      student: {
-        create: {
-          slug: "maria-lopez",
-          draftData: JSON.stringify(mariaDraft),
-          publishedData: JSON.stringify(mariaPublished),
-          publishedAt: new Date(Date.now() - 86400_000),
-        },
-      },
-    },
-  });
-  await prisma.student.update({
-    where: { slug: "maria-lopez" },
-    data: {
-      draftData: JSON.stringify(mariaDraft),
-      publishedData: JSON.stringify(mariaPublished),
-    },
+  await seedStudent(s2Email, s2Password, "maria-lopez", {
+    draftData: JSON.stringify(mariaDraft),
+    publishedData: JSON.stringify(mariaPublished),
+    publishedAt: new Date(Date.now() - 86400_000),
   });
 
   await prisma.setting.upsert({
