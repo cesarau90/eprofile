@@ -225,9 +225,6 @@ export default async function HomePage() {
         <div className="flex-1" />
       )}
 
-      <footer className="border-t border-slate-200 bg-white py-5 text-center text-xs text-slate-400">
-        {settings.siteName} · Proyecto académico — Asignatura Nuevas Tecnologías
-      </footer>
     </main>
   );
 }
