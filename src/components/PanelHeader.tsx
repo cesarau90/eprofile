@@ -22,12 +22,14 @@ export function PanelHeader({
         </div>
         <div className="ml-auto flex items-center gap-2">
           {right}
-          <a
-            href="/logout"
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
-          >
-            Cerrar sesión
-          </a>
+          <form action="/logout" method="post">
+            <button
+              type="submit"
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
+            >
+              Cerrar sesión
+            </button>
+          </form>
         </div>
       </div>
     </header>

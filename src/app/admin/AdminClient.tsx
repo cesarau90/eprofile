@@ -134,6 +134,15 @@ function CreateSubmit() {
 export function AdminClient({ students }: { students: Student[] }) {
   const [createState, createAction] = useFormState(createStudentAction, {} as ActionState);
   const [slug, setSlug] = React.useState("");
+  const createFormRef = React.useRef<HTMLFormElement>(null);
+
+  // Al crear con éxito: limpiar el formulario (sin tocar la sesión ni navegar).
+  React.useEffect(() => {
+    if (createState.ok) {
+      createFormRef.current?.reset();
+      setSlug("");
+    }
+  }, [createState]);
   const [rowMsg, setRowMsg] = React.useState<Record<string, ActionState>>({});
   const [busy, setBusy] = React.useState<string | null>(null);
 
@@ -164,7 +173,7 @@ export function AdminClient({ students }: { students: Student[] }) {
             Se genera el acceso y la ruta pública del perfil.
           </p>
         </div>
-        <form action={createAction} className="grid gap-4 sm:grid-cols-3">
+        <form ref={createFormRef} action={createAction} className="grid gap-4 sm:grid-cols-3">
           <Field label="Correo" htmlFor="c-email">
             <div className="relative">
               <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">

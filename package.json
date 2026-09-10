@@ -15,6 +15,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "test": "tsx tests/run.ts",
+    "test:admin-session": "tsx tests/admin-session.ts",
     "setup": "prisma generate && prisma migrate deploy && tsx prisma/seed.ts"
   },
   "prisma": {
