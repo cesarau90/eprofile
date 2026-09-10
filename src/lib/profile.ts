@@ -127,9 +127,27 @@ export function normalizeSlug(input: string): string {
   return input
     .toLowerCase()
     .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "") // quitar acentos/diacríticos
+    .replace(/[^a-z0-9]+/g, "-") // espacios y símbolos -> guion
+    .replace(/-+/g, "-") // sin guiones duplicados
+    .replace(/^-+|-+$/g, "") // sin guiones iniciales ni finales
+    .slice(0, 40)
+    .replace(/-+$/g, ""); // el corte a 40 no debe dejar un guion final
+}
+
+/**
+ * Igual que `normalizeSlug`, pero para escribir en vivo en el input: conserva
+ * un único guion final para poder teclear "juan-" y luego "perez". Al enviar,
+ * el servidor vuelve a pasar el valor por `normalizeSlug` (estricto).
+ */
+export function normalizeSlugInput(input: string): string {
+  return input
+    .toLowerCase()
+    .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
+    .replace(/[^a-z0-9-]+/g, "-") // caracteres no permitidos -> guion
+    .replace(/-+/g, "-") // sin guiones duplicados
+    .replace(/^-+/, "") // sin guiones iniciales (el final sí se permite al teclear)
     .slice(0, 40);
 }
 

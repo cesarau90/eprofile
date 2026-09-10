@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
 import { Card, Field, Input, Button, Alert, Badge } from "@/components/ui";
-import { normalizeSlug } from "@/lib/profile";
+import { normalizeSlug, normalizeSlugInput } from "@/lib/profile";
 import {
   createStudentAction,
   setActiveAction,
@@ -190,7 +190,7 @@ export function AdminClient({ students }: { students: Student[] }) {
               <Input id="c-pw" name="password" type="text" required minLength={8} className="pl-9 transition duration-200" />
             </div>
           </Field>
-          <Field label="Slug (ruta pública)" htmlFor="c-slug" hint={slug ? `eprofile.com/${slug}` : "minúsculas y guiones"}>
+          <Field label="Slug (ruta pública)" htmlFor="c-slug" hint={slug ? `eprofile.com/${normalizeSlug(slug)}` : "minúsculas y guiones"}>
             <div className="relative">
               <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                 <LinkIcon />
@@ -200,7 +200,8 @@ export function AdminClient({ students }: { students: Student[] }) {
                 name="slug"
                 required
                 value={slug}
-                onChange={(e) => setSlug(normalizeSlug(e.target.value))}
+                onChange={(e) => setSlug(normalizeSlugInput(e.target.value))}
+                onBlur={() => setSlug((s) => normalizeSlug(s))}
                 placeholder="juan-perez"
                 className="pl-9 transition duration-200"
               />
