@@ -7,7 +7,13 @@ import { hashPassword, passwordIssues } from "@/lib/password";
 import { normalizeSlug, slugIssue, emptyProfile } from "@/lib/profile";
 import { getSettings, saveSettings } from "@/lib/settings";
 
-export type ActionState = { ok?: boolean; error?: string; message?: string };
+export type ActionState = {
+  ok?: boolean;
+  error?: string;
+  message?: string;
+  /** "warning" pinta el mensaje en ámbar (p. ej. al desactivar una cuenta). */
+  tone?: "success" | "warning";
+};
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -51,7 +57,9 @@ export async function setActiveAction(userId: string, active: boolean): Promise<
   if (user.role === "PLATFORM_ADMIN") return { error: "No se puede desactivar una cuenta de administrador." };
   await prisma.user.update({ where: { id: userId }, data: { active } });
   revalidatePath("/admin");
-  return { ok: true, message: active ? "Cuenta reactivada." : "Cuenta desactivada. Su EProfile deja de verse." };
+  return active
+    ? { ok: true, message: "Cuenta reactivada.", tone: "success" }
+    : { ok: true, message: "Cuenta desactivada. Su EProfile deja de verse.", tone: "warning" };
 }
 
 export async function deleteStudentAction(studentId: string, confirmSlug: string): Promise<ActionState> {

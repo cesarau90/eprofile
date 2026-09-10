@@ -385,7 +385,15 @@ function StudentRow({
         ) : null}
 
         {msg?.error ? <p className="anim-fade-in mt-2 text-xs text-red-600">{msg.error}</p> : null}
-        {msg?.ok ? <p className="anim-fade-in mt-2 text-xs text-green-600">{msg.message}</p> : null}
+        {msg?.ok ? (
+          <p
+            className={`anim-fade-in mt-2 text-xs ${
+              msg.tone === "warning" ? "text-amber-600" : "text-green-600"
+            }`}
+          >
+            {msg.message}
+          </p>
+        ) : null}
       </div>
     </div>
   );
