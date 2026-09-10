@@ -30,13 +30,23 @@ export default async function StudentAdminPage({ params }: { params: { slug: str
         title={`Editar EProfile · /${params.slug}`}
         subtitle={student.user.email}
         right={
-          <Link
-            href={`/${params.slug}`}
-            target="_blank"
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-600 hover:bg-brand-50"
-          >
-            Ver pública ↗
-          </Link>
+          <>
+            {actingAsAdmin ? (
+              <Link
+                href="/admin"
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700"
+              >
+                ← Volver al panel
+              </Link>
+            ) : null}
+            <Link
+              href={`/${params.slug}`}
+              target="_blank"
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-brand-600 hover:bg-brand-50"
+            >
+              Ver pública ↗
+            </Link>
+          </>
         }
       />
       <main className="mx-auto max-w-5xl px-4 py-6">
